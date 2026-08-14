@@ -34,7 +34,7 @@ export default function HomePage() {
             </h1>
             <p className="text-xl text-slate-600 mb-8 leading-relaxed max-w-2xl">
               {isNe
-                ? "तपाईंको मेडिकल रिपोर्ट स्क्यान गर्नुहोस् र सरल अंग्रेजी वा नेपालीमा परिणाम बुझ्नुहोस्।"
+                ? "तपाईंको मेडिकल रिपोर्ट स्क्यान गर्नुहोस् र तपाईं सरल अंग्रेजी वा नेपालीमा परिणाम बुझ्नुहोस्।"
                 : "Scan your medical report and understand your results in simple English or Nepali."}
             </p>
             <div className="flex flex-wrap gap-3 mb-10">
