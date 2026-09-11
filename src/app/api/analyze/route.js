@@ -20,6 +20,8 @@ export async function POST(req) {
       fileSize: file.size,
     });
 
+    console.info(`[ReportScan] Processing report ${reportId}: ${file.name}`);
+
     const analysis = await analyzeReportWithGemini({
       fileBuffer,
       mimeType: file.type,
@@ -27,6 +29,11 @@ export async function POST(req) {
     });
 
     await saveReportAnalysis(reportId, analysis);
+
+    console.info(`[ReportScan] Report ${reportId} analysis complete`, {
+      status: analysis.status,
+      resultCount: analysis.results?.length || 0,
+    });
 
     return NextResponse.json({
       success: true,
@@ -44,6 +51,7 @@ export async function POST(req) {
       await saveReportError(reportId, error);
     } catch (dbError) {
       console.error("[ReportScan] Failed to save report error state", {
+        reportId,
         message: dbError?.message,
       });
     }
