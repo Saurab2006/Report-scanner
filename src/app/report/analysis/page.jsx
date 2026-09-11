@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { AlertCircle, ArrowLeft, CheckCircle2, CircleAlert, CircleHelp, HeartPulse } from "lucide-react";
+import { AlertCircle, ArrowLeft, CheckCircle2, CircleAlert, CircleHelp, Download, HeartPulse } from "lucide-react";
 import { useLang } from "@/app/components/LanguageContext";
 
 const statusContent = {
@@ -10,6 +10,7 @@ const statusContent = {
   normal: { label: "NORMAL", labelNe: "सामान्य", className: "status normal" },
   low: { label: "LOW", labelNe: "कम", className: "status low" },
   needs_review: { label: "NEEDS REVIEW", labelNe: "समीक्षा आवश्यक", className: "status review" },
+  unknown: { label: "NEEDS REVIEW", labelNe: "समीक्षा आवश्यक", className: "status review" },
 };
 
 function ResultCard({ result, isNe }) {
@@ -25,7 +26,7 @@ function ResultCard({ result, isNe }) {
         {result.value} {result.unit && <span>{result.unit}</span>}
       </p>
       <p className="reference">
-        {isNe ? "सन्दर्भ" : "Reference"}: <strong>{result.referenceRange || (isNe ? "फेला परेन" : "Not found")}</strong>
+        {isNe ? "सन्दर्भ:" : "Reference:"} <strong>{result.referenceRange || (isNe ? "फेला परेन" : "Not found")}</strong>
       </p>
 
       <div className="result-section">
@@ -33,15 +34,7 @@ function ResultCard({ result, isNe }) {
           <CircleHelp size={18} />
           {isNe ? "यसको अर्थ के हो?" : "What does this mean?"}
         </h3>
-        <p>{isNe ? result.explanationNe : result.explanationEn}</p>
-      </div>
-
-      <div className="result-section">
-        <h3>
-          <HeartPulse size={18} />
-          {isNe ? "के गर्न सकिन्छ?" : "What can you do?"}
-        </h3>
-        <p>{isNe ? result.guidanceNe : result.guidanceEn}</p>
+        <p>{result.explanation || (isNe ? "विस्तारित जानकारी उपलब्ध नाहे।" : "No additional details available.")}</p>
       </div>
     </article>
   );
@@ -77,6 +70,7 @@ export default function AnalysisPage() {
   }
 
   const counts = data.statusCounts || { high: 0, normal: 0, low: 0, needs_review: 0 };
+  const hasResults = (data.results || []).length > 0;
 
   return (
     <div className="page-shell results-page">
@@ -88,8 +82,13 @@ export default function AnalysisPage() {
       <section className="results-header">
         <div>
           <p className="eyebrow">{isNe ? "विश्लेषण परिणाम" : "Analysis Results"}</p>
-          <h1>{data.reportName}</h1>
-          <p>{isNe ? data.summaryNe : data.summaryEn}</p>
+          <h1>{data.reportName || (isNe ? "मेडिकल रिपोर्ट" : "Medical Report")}</h1>
+          <p>
+            {data.summary ||
+              (isNe
+                ? "आपूर्तिकर्ता द्वारा विश्लेषण गरिएको"
+                : "Analyzed by AI")}
+          </p>
         </div>
         <div className="language-row compact-row">
           <button className={lang === "en" ? "active" : ""} onClick={() => setLang("en")}>
@@ -102,28 +101,86 @@ export default function AnalysisPage() {
         </div>
       </section>
 
-      <section className="summary-strip" aria-label={isNe ? "सारांश" : "Summary"}>
-        <span>🔴 {counts.high} {isNe ? "उच्च" : "High"}</span>
-        <span>🟢 {counts.normal} {isNe ? "सामान्य" : "Normal"}</span>
-        <span>🟡 {counts.low} {isNe ? "कम" : "Low"}</span>
-        <span>⚪ {counts.needs_review} {isNe ? "समीक्षा" : "Needs Review"}</span>
-      </section>
+      {hasResults && (
+        <section className="summary-strip" aria-label={isNe ? "सारांश" : "Summary"}>
+          <span>
+            🔴 {counts.high} {isNe ? "उच्च" : "High"}
+          </span>
+          <span>
+            🟢 {counts.normal} {isNe ? "सामान्य" : "Normal"}
+          </span>
+          <span>
+            🟡 {counts.low} {isNe ? "कम" : "Low"}
+          </span>
+          <span>
+            ⚪ {counts.needs_review} {isNe ? "समीक्षा" : "Review"}
+          </span>
+        </section>
+      )}
 
       <p className="database-note">
         {data.saved
           ? isNe
-            ? `डाटाबेसमा सुरक्षित भयो। रिपोर्ट ID: ${data.reportId}`
+            ? `डाटाबेसमा सुरक्षित। रिपोर्ट ID: ${data.reportId}`
             : `Saved to database. Report ID: ${data.reportId}`
           : isNe
-            ? "डाटाबेस जडान छैन, त्यसैले यो परिणाम अहिले ब्राउजरमा मात्र राखिएको छ।"
-            : "Database is not connected, so this result is stored in the browser for now."}
+            ? "स्थानीय विश्लेषण - डाटाबेसमा सुरक्षित नाहे।"
+            : "Local analysis - not saved to database."}
       </p>
 
-      <section className="result-list">
-        {data.results.map((result) => (
-          <ResultCard key={`${result.testName}-${result.value}`} result={result} isNe={isNe} />
-        ))}
-      </section>
+      {data.reportSummary && (
+        <article className="result-card">
+          <h2>{isNe ? "विश्लेषण सारांश" : "Analysis Summary"}</h2>
+          <p>{data.reportSummary}</p>
+        </article>
+      )}
+
+      {hasResults ? (
+        <section className="result-list">
+          {data.results.map((result) => (
+            <ResultCard key={`${result.testName}-${result.value}`} result={result} isNe={isNe} />
+          ))}
+        </section>
+      ) : (
+        <section className="empty-state">
+          <AlertCircle size={38} />
+          <h2>{isNe ? "कोई परिणाम नहीं" : "No Results Found"}</h2>
+          <p>
+            {isNe
+              ? "रिपोर्ट को पढ़ा नहीं जा सका। कृपया एक स्पष्ट तस्वीर अपलोड करें।"
+              : "The report could not be read. Please upload a clearer image."}
+          </p>
+          <Link href="/scan" className="primary-action compact">
+            {isNe ? "फिर से प्रयास करें" : "Try Again"}
+          </Link>
+        </section>
+      )}
+
+      {(data.abnormalFindings || []).length > 0 && (
+        <article className="result-card">
+          <h2>{isNe ? "असामान्य निष्कर्ष" : "Abnormal Findings"}</h2>
+          <ul style={{ paddingLeft: "20px", margin: "12px 0 0" }}>
+            {data.abnormalFindings.map((finding, idx) => (
+              <li key={idx} style={{ margin: "6px 0", color: "var(--muted)" }}>
+                {finding}
+              </li>
+            ))}
+          </ul>
+        </article>
+      )}
+
+      {(data.recommendations || []).length > 0 && (
+        <article className="result-card">
+          <h2>{isNe ? "सिफारिशें" : "Recommendations"}</h2>
+          <ul style={{ paddingLeft: "20px", margin: "12px 0 0" }}>
+            {data.recommendations.map((rec, idx) => (
+              <li key={idx} style={{ margin: "6px 0", color: "var(--muted)" }}>
+                {rec}
+              </li>
+            ))}
+          </ul>
+        </article>
+      )}
 
       <section className="safety-box">
         <CircleAlert size={22} />
@@ -131,16 +188,18 @@ export default function AnalysisPage() {
           <h2>{isNe ? "महत्त्वपूर्ण स्वास्थ्य सूचना" : "Important Medical Disclaimer"}</h2>
           <p>
             {isNe
-              ? "ReportScan ले शैक्षिक जानकारी मात्र दिन्छ। यसले रोग निदान गर्दैन, औषधि सिफारिस गर्दैन, र व्यावसायिक चिकित्सा सल्लाहको स्थान लिँदैन। असामान्य वा अस्पष्ट परिणामका लागि योग्य स्वास्थ्यकर्मीसँग परामर्श गर्नुहोस्।"
-              : "ReportScan provides educational information only. It does not diagnose disease, prescribe medication, or replace professional medical advice. Consult a qualified healthcare professional for abnormal or unclear results."}
+              ? "ReportScan शैक्षणिक जानकारी मात्र प्रदान करता है। यह किसी भी बीमारी का निदान नहीं करता, दवा नहीं देता, और न ही पेशेवर चिकित्सा सलाह का विकल्प है। किसी भी स्वास्थ्य संबंधी समस्या के लिए योग्य स्वास्थ्य सेवा प्रदानकर्ता से परामर्श लें।"
+              : "ReportScan provides educational information only. It does not diagnose disease, prescribe medication, or replace professional medical advice. Always consult a qualified healthcare provider for medical concerns."}
           </p>
         </div>
       </section>
 
-      <Link href="/scan" className="secondary-action wide">
-        <CheckCircle2 size={18} />
-        {isNe ? "अर्को रिपोर्ट स्क्यान गर्नुहोस्" : "Scan Another Report"}
-      </Link>
+      <div className="button-row">
+        <Link href="/scan" className="primary-action">
+          <CheckCircle2 size={18} />
+          {isNe ? "अर्को रिपोर्ट स्क्यान गर्नुहोस्" : "Scan Another Report"}
+        </Link>
+      </div>
     </div>
   );
 }
