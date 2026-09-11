@@ -1,33 +1,33 @@
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 import { AppError } from "@/lib/errors";
 
-const DEFAULT_MODEL = "gemini-2.5-flash";
+const DEFAULT_MODEL = "gemini-2.0-flash";
 
 const responseSchema = {
-  type: Type.OBJECT,
+  type: SchemaType.OBJECT,
   properties: {
-    status: { type: Type.STRING, enum: ["success", "unreadable"] },
-    summary: { type: Type.STRING },
-    reportSummary: { type: Type.STRING },
-    confidence: { type: Type.STRING, enum: ["high", "medium", "low"] },
+    status: { type: SchemaType.STRING, enum: ["success", "unreadable"] },
+    summary: { type: SchemaType.STRING },
+    reportSummary: { type: SchemaType.STRING },
+    confidence: { type: SchemaType.STRING, enum: ["high", "medium", "low"] },
     results: {
-      type: Type.ARRAY,
+      type: SchemaType.ARRAY,
       items: {
-        type: Type.OBJECT,
+        type: SchemaType.OBJECT,
         properties: {
-          testName: { type: Type.STRING },
-          value: { type: Type.STRING },
-          unit: { type: Type.STRING },
-          referenceRange: { type: Type.STRING },
-          status: { type: Type.STRING, enum: ["high", "normal", "low", "needs_review", "unknown"] },
-          explanation: { type: Type.STRING },
+          testName: { type: SchemaType.STRING },
+          value: { type: SchemaType.STRING },
+          unit: { type: SchemaType.STRING },
+          referenceRange: { type: SchemaType.STRING },
+          status: { type: SchemaType.STRING, enum: ["high", "normal", "low", "needs_review", "unknown"] },
+          explanation: { type: SchemaType.STRING },
         },
         required: ["testName", "value", "unit", "referenceRange", "status", "explanation"],
       },
     },
-    abnormalFindings: { type: Type.ARRAY, items: { type: Type.STRING } },
-    normalFindings: { type: Type.ARRAY, items: { type: Type.STRING } },
-    recommendations: { type: Type.ARRAY, items: { type: Type.STRING } },
+    abnormalFindings: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+    normalFindings: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+    recommendations: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
   },
   required: [
     "status",
@@ -54,15 +54,15 @@ export async function analyzeReportWithGemini({ fileBuffer, mimeType, fileName }
     throw new AppError("gemini_not_configured", "Gemini API key is not configured on the server.", 503);
   }
 
-  const ai = new GoogleGenAI({ apiKey });
+  const client = new GoogleGenerativeAI({ apiKey });
   const model = process.env.GEMINI_MODEL || DEFAULT_MODEL;
   const timeoutMs = Number(process.env.GEMINI_TIMEOUT_MS || 45000);
 
   try {
     console.info(`[ReportScan] Sending ${mimeType} report "${fileName}" to Gemini model ${model}`);
+    
     const response = await withTimeout(
-      ai.models.generateContent({
-        model,
+      client.getGenerativeModel({ model }).generateContent({
         contents: [
           {
             role: "user",
@@ -77,7 +77,7 @@ export async function analyzeReportWithGemini({ fileBuffer, mimeType, fileName }
             ],
           },
         ],
-        config: {
+        generationConfig: {
           responseMimeType: "application/json",
           responseSchema,
           temperature: 0.1,
@@ -87,7 +87,7 @@ export async function analyzeReportWithGemini({ fileBuffer, mimeType, fileName }
       timeoutMs
     );
 
-    const raw = response.text;
+    const raw = response.response.text();
     if (!raw) {
       throw new AppError("empty_gemini_response", "Gemini did not return an analysis. Please try again.", 502);
     }
@@ -111,7 +111,7 @@ export async function analyzeReportWithGemini({ fileBuffer, mimeType, fileName }
       throw new AppError("gemini_rate_limit", "Gemini is currently rate limited. Please try again later.", 429);
     }
 
-    if (/API key|permission|403|401/i.test(message)) {
+    if (/API key|permission|403|401|UNAUTHENTICATED/i.test(message)) {
       throw new AppError("gemini_auth_error", "Gemini authentication failed. Check the server API key.", 503);
     }
 
@@ -133,19 +133,21 @@ function withTimeout(promise, timeoutMs) {
 }
 
 function buildPrompt(fileName) {
-  return `You are analyzing a medical laboratory report image or PDF named "${fileName}" for a patient-facing education tool.
+  return `You are analyzing a medical laboratory report image or PDF document named "${fileName}" for a patient-facing educational application.
 
-Return only valid JSON matching the provided schema.
+IMPORTANT RULES:
+1. Extract ONLY values, units, reference ranges, comments, and sections that are clearly readable in the uploaded report.
+2. Do NOT invent, hallucinate, or guess any laboratory values, units, reference ranges, patient details, diagnoses, or medications.
+3. If a value or reference range is unclear or unreadable, set that field to "unknown" and status to "needs_review".
+4. Status must be determined ONLY from the report's own reference range when readable.
+5. If NO laboratory results are readable or interpretable, set status to "unreadable", results to empty array [], confidence to "low", and explain that the report could not be reliably interpreted.
+6. Use patient-safe, non-diagnostic wording. Say "may be associated with" instead of "you have" or "indicates".
+7. Do NOT prescribe medicines, dosages, or recommend starting, stopping, or changing any medication.
+8. Recommendations must be general, educational next steps only: consult a qualified healthcare professional, follow up with doctor, discuss symptoms with provider, retry with clearer report, etc.
+9. Return ONLY valid JSON matching the provided schema.
+10. If you cannot reliably read the report, be honest - do not fabricate data.
 
-Rules:
-- Extract only values, units, reference ranges, comments, and sections that are readable in the uploaded report.
-- Do not invent laboratory values, units, reference ranges, patient details, diagnoses, or medications.
-- If a value or reference range is unclear, set that field to "unknown" and status to "needs_review".
-- Status must be based on the report's own reference range whenever readable.
-- If no laboratory results are readable, set status to "unreadable", results to [], confidence to "low", and explain that the report could not be reliably interpreted.
-- Use patient-safe wording. Say "may be associated with" instead of "you have".
-- Do not prescribe medicines, dosages, or tell the user to start, stop, or change medication.
-- Recommendations must be general next steps, such as consult a qualified healthcare professional, retry with a clearer report, follow up, or discuss symptoms.`;
+Analyze the medical report and extract all readable laboratory test results.`;
 }
 
 function parseGeminiJson(raw) {
@@ -166,24 +168,37 @@ function parseGeminiJson(raw) {
 }
 
 function normalizeGeminiResponse(data) {
-  if (!data || typeof data !== "object" || !Array.isArray(data.results)) {
+  if (!data || typeof data !== "object") {
     throw new AppError("invalid_gemini_response", "Gemini returned an analysis in an unexpected format.", 502);
   }
 
-  const results = data.results.map((result) => ({
-    testName: safeString(result.testName, "Unknown test"),
-    value: safeString(result.value, "unknown"),
-    unit: safeString(result.unit, ""),
-    referenceRange: safeString(result.referenceRange, "unknown"),
-    status: normalizeStatus(result.status),
-    explanation: safeString(result.explanation, "This result needs review by a qualified healthcare professional."),
-  }));
+  const results = Array.isArray(data.results)
+    ? data.results.map((result) => ({
+        testName: safeString(result.testName, "Unknown test"),
+        value: safeString(result.value, "unknown"),
+        unit: safeString(result.unit, ""),
+        referenceRange: safeString(result.referenceRange, "unknown"),
+        status: normalizeStatus(result.status),
+        explanation: safeString(
+          result.explanation,
+          "This result needs review by a qualified healthcare professional."
+        ),
+      }))
+    : [];
 
   const status = data.status === "success" && results.length > 0 ? "success" : "unreadable";
   return {
     status,
-    summary: safeString(data.summary, status === "success" ? "The report was analyzed." : "No readable laboratory values were found."),
-    reportSummary: safeString(data.reportSummary, ""),
+    summary: safeString(
+      data.summary,
+      status === "success"
+        ? "The report was successfully analyzed."
+        : "No readable laboratory values were found in the uploaded report. Please ensure the image is clear and contains medical test results."
+    ),
+    reportSummary: safeString(
+      data.reportSummary,
+      status === "success" ? "Medical report analysis complete." : "Unable to interpret report content."
+    ),
     confidence: ["high", "medium", "low"].includes(data.confidence) ? data.confidence : "low",
     results,
     abnormalFindings: safeStringArray(data.abnormalFindings),
@@ -202,5 +217,7 @@ function safeString(value, fallback) {
 }
 
 function safeStringArray(value) {
-  return Array.isArray(value) ? value.filter((item) => typeof item === "string" && item.trim()).map((item) => item.trim()) : [];
+  return Array.isArray(value)
+    ? value.filter((item) => typeof item === "string" && item.trim()).map((item) => item.trim())
+    : [];
 }
