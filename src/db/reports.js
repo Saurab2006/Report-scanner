@@ -1,47 +1,65 @@
-import { db, hasDatabase } from "@/db";
-import { medicalReports, medicalResults } from "@/db/schema";
+import { ObjectId } from "mongodb";
+import { getMongoDb } from "@/db/mongodb";
 
-export async function saveAnalysis(analysis, fileType) {
-  if (!hasDatabase) {
-    return { saved: false, reportId: null };
-  }
+const COLLECTION = "reports";
 
-  try {
-    const [report] = await db
-      .insert(medicalReports)
-      .values({
-        fileName: analysis.reportName,
-        fileType: fileType || "",
-        reportType: analysis.reportType,
-        summaryEn: analysis.summaryEn,
-        summaryNe: analysis.summaryNe,
-        statusCounts: analysis.statusCounts,
-      })
-      .returning({ id: medicalReports.id });
+export async function createReportRecord({ fileName, mimeType, fileSize }) {
+  const db = await getMongoDb();
+  const now = new Date();
+  const result = await db.collection(COLLECTION).insertOne({
+    originalFilename: fileName,
+    mimeType,
+    fileSize,
+    uploadTimestamp: now,
+    processingStatus: "processing",
+    analysisStatus: "pending",
+    geminiAnalysis: null,
+    analysisTimestamp: null,
+    error: null,
+    createdAt: now,
+    updatedAt: now,
+  });
 
-    if (analysis.results.length > 0) {
-      await db.insert(medicalResults).values(
-        analysis.results.map((result) => ({
-          reportId: report.id,
-          testName: result.testName,
-          value: result.value,
-          numericValue:
-            result.numericValue === null || result.numericValue === undefined
-              ? null
-              : String(result.numericValue),
-          unit: result.unit || null,
-          referenceRange: result.referenceRange || null,
-          status: result.status,
-          explanationEn: result.explanationEn,
-          explanationNe: result.explanationNe,
-          guidanceEn: result.guidanceEn,
-          guidanceNe: result.guidanceNe,
-        }))
-      );
+  return result.insertedId.toString();
+}
+
+export async function saveReportAnalysis(reportId, analysis) {
+  const db = await getMongoDb();
+  const now = new Date();
+  await db.collection(COLLECTION).updateOne(
+    { _id: toObjectId(reportId) },
+    {
+      $set: {
+        processingStatus: analysis.status === "success" ? "complete" : "needs_review",
+        analysisStatus: analysis.status,
+        geminiAnalysis: analysis,
+        analysisTimestamp: now,
+        error: null,
+        updatedAt: now,
+      },
     }
+  );
+}
 
-    return { saved: true, reportId: report.id };
-  } catch {
-    return { saved: false, reportId: null };
-  }
+export async function saveReportError(reportId, error) {
+  if (!reportId) return;
+  const db = await getMongoDb();
+  await db.collection(COLLECTION).updateOne(
+    { _id: toObjectId(reportId) },
+    {
+      $set: {
+        processingStatus: "failed",
+        analysisStatus: "error",
+        error: {
+          code: error?.code || "processing_error",
+          message: error?.message || "Report processing failed.",
+        },
+        updatedAt: new Date(),
+      },
+    }
+  );
+}
+
+function toObjectId(id) {
+  return new ObjectId(id);
 }

@@ -1,29 +1,54 @@
 import { NextResponse } from "next/server";
-import { saveAnalysis } from "@/db/reports";
-import { analyzeReport } from "@/lib/ai-service";
+import { errorResponse } from "@/lib/errors";
+import { analyzeReportWithGemini } from "@/lib/gemini-service";
+import { validateUploadedFile } from "@/lib/file-validation";
+import { createReportRecord, saveReportAnalysis, saveReportError } from "@/db/reports";
+
+export const runtime = "nodejs";
 
 export async function POST(req) {
+  let reportId = null;
+
   try {
-    const body = await req.json();
-    const result = analyzeReport({
-      fileName: body.fileName,
-      fileType: body.fileType,
-      reportText: body.reportText,
+    const formData = await req.formData();
+    const file = formData.get("file");
+    const fileBuffer = await validateUploadedFile(file);
+
+    reportId = await createReportRecord({
+      fileName: file.name,
+      mimeType: file.type,
+      fileSize: file.size,
     });
-    const savedReport = await saveAnalysis(result, body.fileType);
+
+    const analysis = await analyzeReportWithGemini({
+      fileBuffer,
+      mimeType: file.type,
+      fileName: file.name,
+    });
+
+    await saveReportAnalysis(reportId, analysis);
 
     return NextResponse.json({
       success: true,
       data: {
-        ...result,
-        saved: savedReport.saved,
-        reportId: savedReport.reportId,
+        reportId,
+        fileName: file.name,
+        mimeType: file.type,
+        fileSize: file.size,
+        ...analysis,
+        saved: true,
       },
     });
-  } catch {
-    return NextResponse.json(
-      { success: false, error: "Analysis failed" },
-      { status: 500 }
-    );
+  } catch (error) {
+    try {
+      await saveReportError(reportId, error);
+    } catch (dbError) {
+      console.error("[ReportScan] Failed to save report error state", {
+        message: dbError?.message,
+      });
+    }
+
+    const response = errorResponse(error);
+    return NextResponse.json(response.body, { status: response.status });
   }
 }
