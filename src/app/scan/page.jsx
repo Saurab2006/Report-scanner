@@ -81,7 +81,7 @@ export default function ScanPage() {
   return (
     <div className="page-shell scan-page">
       <section className="section-heading">
-        <p className="eyebrow">Home -> Upload/Scan Report -> Analyze -> Results</p>
+        <p className="eyebrow">{"Home -> Upload/Scan Report -> Analyze -> Results"}</p>
         <h1>{isNe ? "रिपोर्ट स्क्यान वा अपलोड गर्नुहोस्" : "Upload or Scan Report"}</h1>
         <p>
           {isNe

@@ -499,6 +499,17 @@ textarea:focus {
   text-align: center;
 }
 
+.database-note {
+  margin: -6px 0 18px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  color: var(--primary-dark);
+  background: var(--soft);
+  border: 1px solid var(--border);
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
 .result-list {
   display: grid;
   gap: 14px;

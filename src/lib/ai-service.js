@@ -131,13 +131,14 @@ export function analyzeReport({ fileName = "Medical report", fileType = "", repo
 
   const counts = buildCounts(finalResults);
   const total = finalResults.length;
+  const resultWord = total === 1 ? "result was" : "results were";
 
   return {
     reportName: fileName,
     reportType: fileType === "application/pdf" ? "PDF report" : "Image report",
     summaryEn:
       parsed.length > 0
-        ? `${total} result${total === 1 ? "" : "s"} were compared with reference ranges found in the report text. Items without a clear range should be reviewed by a professional.`
+        ? `${total} ${resultWord} compared with reference ranges found in the report text. Items without a clear range should be reviewed by a professional.`
         : "The report needs review because no clear test values with reference ranges were available to compare.",
     summaryNe:
       parsed.length > 0

@@ -14,6 +14,7 @@ ReportScan is a simple, mobile-first Medical Report Scanner built with Next.js. 
 - Support English and नेपाली
 - Provide simple explanations and safe general health guidance
 - Avoid diagnosis, prescriptions, medication dosages, or medication start/stop advice
+- Save analyzed reports and extracted results to PostgreSQL when `DATABASE_URL` is configured
 
 ## Important Medical Safety Note
 
@@ -38,6 +39,28 @@ Build for production:
 ```bash
 npm run build
 ```
+
+## Database
+
+ReportScan uses PostgreSQL with Drizzle ORM. Add a `.env` file with:
+
+```bash
+DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5432/reportscan
+```
+
+Generate and apply migrations:
+
+```bash
+npm run db:generate
+npm run db:migrate
+```
+
+The database schema is intentionally small:
+
+- `medical_reports` stores the uploaded file name, file type, summaries, and status counts.
+- `medical_results` stores each extracted test result, reference range, status, explanation, and guidance.
+
+If `DATABASE_URL` is missing, the app still works and keeps the latest analysis in the browser session.
 
 ## Expected Report Text Format
 

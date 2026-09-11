@@ -1,0 +1,187 @@
+{
+  "id": "5cd25d9a-b5a2-42dd-a58b-bcd1fa24573f",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.medical_reports": {
+      "name": "medical_reports",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "file_name": {
+          "name": "file_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "file_type": {
+          "name": "file_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "report_type": {
+          "name": "report_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "summary_en": {
+          "name": "summary_en",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "summary_ne": {
+          "name": "summary_ne",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status_counts": {
+          "name": "status_counts",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.medical_results": {
+      "name": "medical_results",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "report_id": {
+          "name": "report_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "test_name": {
+          "name": "test_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "value": {
+          "name": "value",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "numeric_value": {
+          "name": "numeric_value",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "unit": {
+          "name": "unit",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "reference_range": {
+          "name": "reference_range",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "explanation_en": {
+          "name": "explanation_en",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "explanation_ne": {
+          "name": "explanation_ne",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "guidance_en": {
+          "name": "guidance_en",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "guidance_ne": {
+          "name": "guidance_ne",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "medical_results_report_id_medical_reports_id_fk": {
+          "name": "medical_results_report_id_medical_reports_id_fk",
+          "tableFrom": "medical_results",
+          "tableTo": "medical_reports",
+          "columnsFrom": [
+            "report_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

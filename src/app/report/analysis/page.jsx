@@ -109,6 +109,16 @@ export default function AnalysisPage() {
         <span>⚪ {counts.needs_review} {isNe ? "समीक्षा" : "Needs Review"}</span>
       </section>
 
+      <p className="database-note">
+        {data.saved
+          ? isNe
+            ? `डाटाबेसमा सुरक्षित भयो। रिपोर्ट ID: ${data.reportId}`
+            : `Saved to database. Report ID: ${data.reportId}`
+          : isNe
+            ? "डाटाबेस जडान छैन, त्यसैले यो परिणाम अहिले ब्राउजरमा मात्र राखिएको छ।"
+            : "Database is not connected, so this result is stored in the browser for now."}
+      </p>
+
       <section className="result-list">
         {data.results.map((result) => (
           <ResultCard key={`${result.testName}-${result.value}`} result={result} isNe={isNe} />

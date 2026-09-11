@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { saveAnalysis } from "@/db/reports";
 import { analyzeReport } from "@/lib/ai-service";
 
 export async function POST(req) {
@@ -9,8 +10,16 @@ export async function POST(req) {
       fileType: body.fileType,
       reportText: body.reportText,
     });
+    const savedReport = await saveAnalysis(result, body.fileType);
 
-    return NextResponse.json({ success: true, data: result });
+    return NextResponse.json({
+      success: true,
+      data: {
+        ...result,
+        saved: savedReport.saved,
+        reportId: savedReport.reportId,
+      },
+    });
   } catch {
     return NextResponse.json(
       { success: false, error: "Analysis failed" },
