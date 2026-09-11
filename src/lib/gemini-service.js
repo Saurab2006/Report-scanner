@@ -1,3 +1,5 @@
+"use server";
+
 import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 import { AppError } from "@/lib/errors";
 
