@@ -1,6 +1,6 @@
 import "./globals.css";
-import { LangProvider } from "@/app/components/LanguageContext";
-import { Navigation } from "@/app/components/Navigation";
+import { LangProvider } from "@/components/LanguageContext";
+import { Navigation } from "@/components/Navigation";
 
 export const metadata = {
   title: "ReportScan | Medical Report Scanner",

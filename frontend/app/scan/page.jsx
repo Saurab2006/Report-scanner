@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState, useRef } from "react";
 import { AlertCircle, ArrowLeft, FileText, Loader, Upload, Zap } from "lucide-react";
-import { useLang } from "@/app/components/LanguageContext";
+import { useLang } from "@/components/LanguageContext";
 
 const STATUS_MESSAGES = {
   idle: { en: "Ready to scan", ne: "स्क्यान गर्न तयार" },
@@ -64,7 +64,8 @@ export default function ScanPage() {
       const formData = new FormData();
       formData.append("file", selectedFile);
 
-      const uploadResponse = await fetch("/api/analyze", {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      const uploadResponse = await fetch(`${apiUrl.replace(/\/$/, "")}/api/analyze`, {
         method: "POST",
         body: formData,
       });

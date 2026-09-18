@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { AlertCircle, ArrowLeft, CheckCircle2, CircleAlert, CircleHelp, Download, HeartPulse } from "lucide-react";
-import { useLang } from "@/app/components/LanguageContext";
+import { useLang } from "@/components/LanguageContext";
 
 const statusContent = {
   high: { label: "HIGH", labelNe: "उच्च", className: "status high" },

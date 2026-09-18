@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Camera, FileText, ShieldCheck } from "lucide-react";
-import { useLang } from "@/app/components/LanguageContext";
+import { useLang } from "@/components/LanguageContext";
 
 export default function HomePage() {
   const { lang, setLang } = useLang();

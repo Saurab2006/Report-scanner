@@ -1,4 +1,4 @@
-import { AppError } from "@/lib/errors";
+import { AppError } from "./errors.js";
 
 export const SUPPORTED_MIME_TYPES = new Set([
   "image/jpeg",
@@ -11,13 +11,18 @@ export function getMaxUploadBytes() {
   return Math.max(1, mb) * 1024 * 1024;
 }
 
-export async function validateUploadedFile(file) {
+export function validateUploadedFile(file) {
   if (!file) {
     throw new AppError("missing_file", "Please choose a medical report file.", 400);
   }
 
-  if (!SUPPORTED_MIME_TYPES.has(file.type)) {
-    throw new AppError("unsupported_file_type", "Only JPG, PNG, and PDF medical reports are supported.", 415);
+  const mimeType = file.mimetype || file.type;
+  if (!SUPPORTED_MIME_TYPES.has(mimeType)) {
+    throw new AppError(
+      "unsupported_file_type",
+      "Only JPG, PNG, and PDF medical reports are supported.",
+      415
+    );
   }
 
   if (file.size <= 0) {
@@ -33,8 +38,8 @@ export async function validateUploadedFile(file) {
     );
   }
 
-  const bytes = Buffer.from(await file.arrayBuffer());
-  validateMagicBytes(bytes, file.type);
+  const bytes = file.buffer ? Buffer.from(file.buffer) : Buffer.from(file);
+  validateMagicBytes(bytes, mimeType);
   return bytes;
 }
 
@@ -60,5 +65,9 @@ function validateMagicBytes(bytes, mimeType) {
 }
 
 function corruptedFile() {
-  return new AppError("corrupted_file", "The file does not look like a valid report file. Please upload a clear JPG, PNG, or PDF.", 400);
+  return new AppError(
+    "corrupted_file",
+    "The file does not look like a valid report file. Please upload a clear JPG, PNG, or PDF.",
+    400
+  );
 }
