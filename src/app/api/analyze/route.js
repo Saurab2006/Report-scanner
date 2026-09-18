@@ -8,19 +8,29 @@ export const runtime = "nodejs";
 
 export async function POST(req) {
   let reportId = null;
+  let persistenceWarning = null;
 
   try {
     const formData = await req.formData();
     const file = formData.get("file");
     const fileBuffer = await validateUploadedFile(file);
 
-    reportId = await createReportRecord({
-      fileName: file.name,
-      mimeType: file.type,
-      fileSize: file.size,
-    });
+    try {
+      reportId = await createReportRecord({
+        fileName: file.name,
+        mimeType: file.type,
+        fileSize: file.size,
+      });
+    } catch (error) {
+      if (!isMongoAvailabilityError(error)) throw error;
+      persistenceWarning = "Analysis completed, but the result could not be saved because MongoDB is unavailable.";
+      console.warn("[ReportScan] Continuing without MongoDB persistence", {
+        code: error?.code,
+        message: error?.message,
+      });
+    }
 
-    console.info(`[ReportScan] Processing report ${reportId}: ${file.name}`);
+    console.info(`[ReportScan] Processing report ${reportId || "without persistence"}: ${file.name}`);
 
     const analysis = await analyzeReportWithGemini({
       fileBuffer,
@@ -28,7 +38,19 @@ export async function POST(req) {
       fileName: file.name,
     });
 
-    await saveReportAnalysis(reportId, analysis);
+    if (reportId) {
+      try {
+        await saveReportAnalysis(reportId, analysis);
+      } catch (error) {
+        if (!isMongoAvailabilityError(error)) throw error;
+        persistenceWarning = "Analysis completed, but the result could not be saved because MongoDB is unavailable.";
+        console.warn("[ReportScan] Analysis completed without MongoDB persistence", {
+          reportId,
+          code: error?.code,
+          message: error?.message,
+        });
+      }
+    }
 
     console.info(`[ReportScan] Report ${reportId} analysis complete`, {
       status: analysis.status,
@@ -43,7 +65,8 @@ export async function POST(req) {
         mimeType: file.type,
         fileSize: file.size,
         ...analysis,
-        saved: true,
+        saved: Boolean(reportId) && !persistenceWarning,
+        ...(persistenceWarning ? { persistenceWarning } : {}),
       },
     });
   } catch (error) {
@@ -59,4 +82,8 @@ export async function POST(req) {
     const response = errorResponse(error);
     return NextResponse.json(response.body, { status: response.status });
   }
+}
+
+function isMongoAvailabilityError(error) {
+  return ["mongodb_not_configured", "mongodb_connection_failed"].includes(error?.code);
 }

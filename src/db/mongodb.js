@@ -5,8 +5,8 @@ const globalForMongo = globalThis;
 
 function getMongoConfig() {
   return {
-    uri: process.env.MONGODB_URI,
-    dbName: process.env.MONGODB_DB_NAME || "reportscan",
+    uri: process.env.MONGODB_URI || process.env.MONGO_URI,
+    dbName: process.env.MONGODB_DB_NAME || process.env.MONGO_DB_NAME || "reportscan",
   };
 }
 

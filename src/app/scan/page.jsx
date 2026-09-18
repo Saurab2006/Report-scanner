@@ -69,16 +69,26 @@ export default function ScanPage() {
         body: formData,
       });
 
+      const responseText = await uploadResponse.text();
+      let result;
+      try {
+        result = responseText ? JSON.parse(responseText) : null;
+      } catch {
+        throw new Error(
+          uploadResponse.ok
+            ? "The server returned an invalid response. Please try again."
+            : `The server could not process the report (HTTP ${uploadResponse.status}). Please restart the development server and try again.`
+        );
+      }
+
       if (!uploadResponse.ok) {
-        const errorData = await uploadResponse.json();
-        throw new Error(errorData.error || "Upload failed");
+        throw new Error(result?.error || "Upload failed");
       }
 
       setStatus("saving");
-      const result = await uploadResponse.json();
 
-      if (!result.success) {
-        throw new Error(result.error || "Analysis failed");
+      if (!result?.success) {
+        throw new Error(result?.error || "Analysis failed");
       }
 
       setStatus("success");
