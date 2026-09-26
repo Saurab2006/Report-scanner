@@ -65,6 +65,7 @@ export default function ScanPage() {
       formData.append("file", selectedFile);
 
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      setStatus("analyzing");
       const uploadResponse = await fetch(`${apiUrl.replace(/\/$/, "")}/api/analyze`, {
         method: "POST",
         body: formData,
@@ -100,6 +101,7 @@ export default function ScanPage() {
         fileName: result.data.fileName,
         reportName: result.data.fileName,
         saved: result.data.saved,
+        persistenceWarning: result.data.persistenceWarning || null,
         summary: result.data.summary,
         reportSummary: result.data.reportSummary,
         confidence: result.data.confidence,
@@ -111,7 +113,7 @@ export default function ScanPage() {
           status: r.status,
           explanation: r.explanation,
           explanationEn: r.explanation,
-          explanationNe: r.explanation,
+          explanationNe: r.explanationNe || "",
           guidanceEn: r.explanation,
           guidanceNe: r.explanation,
         })),
@@ -131,6 +133,13 @@ export default function ScanPage() {
       };
 
       window.sessionStorage.setItem("reportscan_latest_analysis", JSON.stringify(analysisData));
+      // Keep a private copy on this device as well, so families can revisit a
+      // result even while the database is temporarily unavailable.
+      if (analysisData.reportId || analysisData.results?.length || analysisData.status === "unreadable") {
+        const history = JSON.parse(window.localStorage.getItem("reportscan_saved_reports") || "[]");
+        const entry = { reportId: analysisData.reportId || `local-${Date.now()}`, fileName: analysisData.fileName, savedAt: new Date().toISOString(), data: analysisData };
+        window.localStorage.setItem("reportscan_saved_reports", JSON.stringify([entry, ...history.filter((item) => item.reportId !== entry.reportId)].slice(0, 30)));
+      }
 
       // Redirect to analysis page
       setTimeout(() => {

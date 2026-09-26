@@ -1,9 +1,10 @@
 import "./globals.css";
 import { LangProvider } from "@/components/LanguageContext";
+import { AuthProvider } from "@/components/AuthContext";
 import { Navigation } from "@/components/Navigation";
 
 export const metadata = {
-  title: "ReportScan | Medical Report Scanner",
+  title: "SwasthaScan | Medical Report Scanner & Insights",
   description: "Upload a medical report and understand HIGH, NORMAL, LOW, and NEEDS REVIEW results in English or Nepali.",
 };
 
@@ -11,14 +12,16 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <LangProvider>
-          <Navigation />
-          <main>{children}</main>
-          <footer className="app-footer">
-            <strong>ReportScan</strong>
-            <span>Educational support only. Consult a qualified healthcare professional.</span>
-          </footer>
-        </LangProvider>
+        <AuthProvider>
+          <LangProvider>
+            <Navigation />
+            <main>{children}</main>
+            <footer className="app-footer">
+              <strong>SwasthaScan</strong>
+              <span>Educational support only. Consult a qualified healthcare professional.</span>
+            </footer>
+          </LangProvider>
+        </AuthProvider>
       </body>
     </html>
   );

@@ -1,205 +1,33 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { AlertCircle, ArrowLeft, CheckCircle2, CircleAlert, CircleHelp, Download, HeartPulse } from "lucide-react";
+import { useEffect, useState } from "react";
+import { AlertCircle, ArrowLeft, Bookmark, CheckCircle2, CircleAlert, CircleHelp } from "lucide-react";
 import { useLang } from "@/components/LanguageContext";
 
-const statusContent = {
-  high: { label: "HIGH", labelNe: "उच्च", className: "status high" },
-  normal: { label: "NORMAL", labelNe: "सामान्य", className: "status normal" },
-  low: { label: "LOW", labelNe: "कम", className: "status low" },
-  needs_review: { label: "NEEDS REVIEW", labelNe: "समीक्षा आवश्यक", className: "status review" },
-  unknown: { label: "NEEDS REVIEW", labelNe: "समीक्षा आवश्यक", className: "status review" },
-};
+const statusContent = { high: ["HIGH", "उच्च"], normal: ["NORMAL", "सामान्य"], low: ["LOW", "कम"], needs_review: ["NEEDS REVIEW", "जाँच आवश्यक"], unknown: ["NEEDS REVIEW", "जाँच आवश्यक"] };
+const nepaliNames = { "Total Leucocyte Count (TLC)": "कुल सेतो रक्तकोषिका (TLC)", Neutrophils: "न्युट्रोफिल", Lymphocytes: "लिम्फोसाइट", Eosinophils: "इओसिनोफिल", Monocytes: "मोनोसाइट", Basophils: "बेसोफिल", Platelets: "प्लेटलेट", Hemoglobin: "हिमोग्लोबिन", RBC: "रातो रक्तकोषिका", "Blood Sugar Random": "अनियमित रक्तचिनी", Creatinine: "क्रिएटिनिन", Sodium: "सोडियम", Potassium: "पोटासियम", TSH: "थाइराइड जाँच (TSH)" };
 
+function simpleNepali(result) {
+  const name = nepaliNames[result.testName] || result.testName;
+  if (result.status === "normal") return `${name} को नतिजा दिइएको सामान्य सीमाभित्र छ। अहिले यसबारे चिन्ता गर्नुपर्ने देखिँदैन।`;
+  if (result.status === "high") return `${name} को नतिजा सामान्यभन्दा बढी देखिएको छ। यसको अर्थ बुझ्न डाक्टरसँग रिपोर्ट देखाएर सल्लाह लिनुहोस्।`;
+  if (result.status === "low") return `${name} को नतिजा सामान्यभन्दा कम देखिएको छ। कारण बुझ्न डाक्टरसँग रिपोर्ट देखाएर सल्लाह लिनुहोस्।`;
+  return `${name} को नतिजा स्पष्ट छैन वा थप जाँच आवश्यक हुन सक्छ। डाक्टरसँग रिपोर्ट देखाएर बुझ्नुहोस्।`;
+}
 function ResultCard({ result, isNe }) {
   const display = statusContent[result.status] || statusContent.needs_review;
-
-  return (
-    <article className="result-card">
-      <div className="result-top">
-        <h2>{result.testName}</h2>
-        <span className={display.className}>{isNe ? display.labelNe : display.label}</span>
-      </div>
-      <p className="result-value">
-        {result.value} {result.unit && <span>{result.unit}</span>}
-      </p>
-      <p className="reference">
-        {isNe ? "सन्दर्भ:" : "Reference:"} <strong>{result.referenceRange || (isNe ? "फेला परेन" : "Not found")}</strong>
-      </p>
-
-      <div className="result-section">
-        <h3>
-          <CircleHelp size={18} />
-          {isNe ? "यसको अर्थ के हो?" : "What does this mean?"}
-        </h3>
-        <p>{result.explanation || (isNe ? "विस्तारित जानकारी उपलब्ध नाहे।" : "No additional details available.")}</p>
-      </div>
-    </article>
-  );
+  return <article className="result-card"><div className="result-top"><h2>{isNe ? (nepaliNames[result.testName] || result.testName) : result.testName}</h2><span className={`status ${result.status === "normal" ? "normal" : result.status === "high" ? "high" : result.status === "low" ? "low" : "review"}`}>{isNe ? display[1] : display[0]}</span></div><p className="result-value">{result.value} {result.unit && <span>{result.unit}</span>}</p><p className="reference">{isNe ? "सामान्य सीमा:" : "Reference:"} <strong>{result.referenceRange || (isNe ? "थाहा भएन" : "Not found")}</strong></p><div className="result-section"><h3><CircleHelp size={18} />{isNe ? "यसको सरल अर्थ" : "What does this mean?"}</h3><p>{isNe ? (result.explanationNe || simpleNepali(result)) : (result.explanation || "No additional details available.")}</p></div></article>;
 }
 
 export default function AnalysisPage() {
-  const { lang, setLang } = useLang();
-  const isNe = lang === "ne";
-  const [data] = useState(() => {
-    if (typeof window === "undefined") return null;
-    const saved = window.sessionStorage.getItem("reportscan_latest_analysis");
-    if (!saved) return null;
-    try {
-      return JSON.parse(saved);
-    } catch {
-      return null;
-    }
-  });
-
-  if (!data) {
-    return (
-      <div className="page-shell">
-        <section className="empty-state">
-          <AlertCircle size={38} />
-          <h1>{isNe ? "विश्लेषण भेटिएन" : "No Analysis Found"}</h1>
-          <p>{isNe ? "कृपया रिपोर्ट स्क्यान वा अपलोड गर्नुहोस्।" : "Please scan or upload a report first."}</p>
-          <Link href="/scan" className="primary-action compact">
-            {isNe ? "रिपोर्ट स्क्यान गर्नुहोस्" : "Scan Report"}
-          </Link>
-        </section>
-      </div>
-    );
-  }
-
-  const counts = data.statusCounts || { high: 0, normal: 0, low: 0, needs_review: 0 };
-  const hasResults = (data.results || []).length > 0;
-
-  return (
-    <div className="page-shell results-page">
-      <Link href="/scan" className="back-link">
-        <ArrowLeft size={18} />
-        {isNe ? "स्क्यानमा फर्कनुहोस्" : "Back to Scan"}
-      </Link>
-
-      <section className="results-header">
-        <div>
-          <p className="eyebrow">{isNe ? "विश्लेषण परिणाम" : "Analysis Results"}</p>
-          <h1>{data.reportName || (isNe ? "मेडिकल रिपोर्ट" : "Medical Report")}</h1>
-          <p>
-            {data.summary ||
-              (isNe
-                ? "आपूर्तिकर्ता द्वारा विश्लेषण गरिएको"
-                : "Analyzed by AI")}
-          </p>
-        </div>
-        <div className="language-row compact-row">
-          <button className={lang === "en" ? "active" : ""} onClick={() => setLang("en")}>
-            English
-          </button>
-          <span>|</span>
-          <button className={lang === "ne" ? "active" : ""} onClick={() => setLang("ne")}>
-            नेपाली
-          </button>
-        </div>
-      </section>
-
-      {hasResults && (
-        <section className="summary-strip" aria-label={isNe ? "सारांश" : "Summary"}>
-          <span>
-            🔴 {counts.high} {isNe ? "उच्च" : "High"}
-          </span>
-          <span>
-            🟢 {counts.normal} {isNe ? "सामान्य" : "Normal"}
-          </span>
-          <span>
-            🟡 {counts.low} {isNe ? "कम" : "Low"}
-          </span>
-          <span>
-            ⚪ {counts.needs_review} {isNe ? "समीक्षा" : "Review"}
-          </span>
-        </section>
-      )}
-
-      <p className="database-note">
-        {data.saved
-          ? isNe
-            ? `डाटाबेसमा सुरक्षित। रिपोर्ट ID: ${data.reportId}`
-            : `Saved to database. Report ID: ${data.reportId}`
-          : isNe
-            ? "स्थानीय विश्लेषण - डाटाबेसमा सुरक्षित नाहे।"
-            : "Local analysis - not saved to database."}
-      </p>
-
-      {data.reportSummary && (
-        <article className="result-card">
-          <h2>{isNe ? "विश्लेषण सारांश" : "Analysis Summary"}</h2>
-          <p>{data.reportSummary}</p>
-        </article>
-      )}
-
-      {hasResults ? (
-        <section className="result-list">
-          {data.results.map((result) => (
-            <ResultCard key={`${result.testName}-${result.value}`} result={result} isNe={isNe} />
-          ))}
-        </section>
-      ) : (
-        <section className="empty-state">
-          <AlertCircle size={38} />
-          <h2>{isNe ? "कोई परिणाम नहीं" : "No Results Found"}</h2>
-          <p>
-            {isNe
-              ? "रिपोर्ट को पढ़ा नहीं जा सका। कृपया एक स्पष्ट तस्वीर अपलोड करें।"
-              : "The report could not be read. Please upload a clearer image."}
-          </p>
-          <Link href="/scan" className="primary-action compact">
-            {isNe ? "फिर से प्रयास करें" : "Try Again"}
-          </Link>
-        </section>
-      )}
-
-      {(data.abnormalFindings || []).length > 0 && (
-        <article className="result-card">
-          <h2>{isNe ? "असामान्य निष्कर्ष" : "Abnormal Findings"}</h2>
-          <ul style={{ paddingLeft: "20px", margin: "12px 0 0" }}>
-            {data.abnormalFindings.map((finding, idx) => (
-              <li key={idx} style={{ margin: "6px 0", color: "var(--muted)" }}>
-                {finding}
-              </li>
-            ))}
-          </ul>
-        </article>
-      )}
-
-      {(data.recommendations || []).length > 0 && (
-        <article className="result-card">
-          <h2>{isNe ? "सिफारिशें" : "Recommendations"}</h2>
-          <ul style={{ paddingLeft: "20px", margin: "12px 0 0" }}>
-            {data.recommendations.map((rec, idx) => (
-              <li key={idx} style={{ margin: "6px 0", color: "var(--muted)" }}>
-                {rec}
-              </li>
-            ))}
-          </ul>
-        </article>
-      )}
-
-      <section className="safety-box">
-        <CircleAlert size={22} />
-        <div>
-          <h2>{isNe ? "महत्त्वपूर्ण स्वास्थ्य सूचना" : "Important Medical Disclaimer"}</h2>
-          <p>
-            {isNe
-              ? "ReportScan शैक्षणिक जानकारी मात्र प्रदान करता है। यह किसी भी बीमारी का निदान नहीं करता, दवा नहीं देता, और न ही पेशेवर चिकित्सा सलाह का विकल्प है। किसी भी स्वास्थ्य संबंधी समस्या के लिए योग्य स्वास्थ्य सेवा प्रदानकर्ता से परामर्श लें।"
-              : "ReportScan provides educational information only. It does not diagnose disease, prescribe medication, or replace professional medical advice. Always consult a qualified healthcare provider for medical concerns."}
-          </p>
-        </div>
-      </section>
-
-      <div className="button-row">
-        <Link href="/scan" className="primary-action">
-          <CheckCircle2 size={18} />
-          {isNe ? "अर्को रिपोर्ट स्क्यान गर्नुहोस्" : "Scan Another Report"}
-        </Link>
-      </div>
-    </div>
-  );
+  const { lang, setLang } = useLang(); const isNe = lang === "ne";
+  const [data, setData] = useState(null); const [ready, setReady] = useState(false); const [history, setHistory] = useState([]); const [opening, setOpening] = useState(false);
+  useEffect(() => { try { setData(JSON.parse(window.sessionStorage.getItem("reportscan_latest_analysis") || "null")); setHistory(JSON.parse(window.localStorage.getItem("reportscan_saved_reports") || "[]")); } finally { setReady(true); } }, []);
+  const openSaved = async (item) => { setOpening(true); try { if (item.data) { setData(item.data); window.sessionStorage.setItem("reportscan_latest_analysis", JSON.stringify(item.data)); return; } const base = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"; const response = await fetch(`${base}/api/reports/${item.reportId}`); const result = await response.json(); if (!response.ok) throw new Error(); const saved = { ...result.data, results: result.data.results || [], statusCounts: countResults(result.data.results || []) }; window.sessionStorage.setItem("reportscan_latest_analysis", JSON.stringify(saved)); setData(saved); } catch { alert(isNe ? "सुरक्षित रिपोर्ट खोल्न सकिएन।" : "Could not open the saved report."); } finally { setOpening(false); } };
+  if (!ready) return <div className="page-shell" aria-busy="true" />;
+  if (!data) return <div className="page-shell"><section className="empty-state"><AlertCircle size={38}/><h1>{isNe ? "विश्लेषण भेटिएन" : "No Analysis Found"}</h1><Link href="/scan" className="primary-action compact">{isNe ? "रिपोर्ट स्क्यान गर्नुहोस्" : "Scan Report"}</Link></section></div>;
+  const counts = data.statusCounts || countResults(data.results || []); const hasResults = (data.results || []).length > 0;
+  return <div className="page-shell results-page"><Link href="/scan" className="back-link"><ArrowLeft size={18}/>{isNe ? "स्क्यानमा फर्कनुहोस्" : "Back to Scan"}</Link><section className="results-header"><div><p className="eyebrow">{isNe ? "विश्लेषण परिणाम" : "Analysis Results"}</p><h1>{data.reportName || (isNe ? "मेडिकल रिपोर्ट" : "Medical Report")}</h1><p>{isNe ? "तपाईंको रिपोर्टको सरल जानकारी" : (data.summary || "Analyzed by AI")}</p></div><div className="language-row compact-row"><button className={lang === "en" ? "active" : ""} onClick={() => setLang("en")}>English</button><span>|</span><button className={lang === "ne" ? "active" : ""} onClick={() => setLang("ne")}>नेपाली</button></div></section>{history.length > 0 && <details className="result-card"><summary style={{cursor:"pointer",fontWeight:800}}><Bookmark size={18} style={{verticalAlign:"middle",marginRight:8}}/>{isNe ? "सुरक्षित रिपोर्टहरू हेर्नुहोस्" : "View saved reports"}</summary><div style={{marginTop:12}}>{history.map((item) => <button key={item.reportId} className="secondary-action" style={{width:"100%",marginTop:8}} disabled={opening} onClick={() => openSaved(item)}>{item.fileName}</button>)}</div></details>}{hasResults && <section className="summary-strip"><span>🔴 {counts.high} {isNe ? "उच्च" : "High"}</span><span>🟢 {counts.normal} {isNe ? "सामान्य" : "Normal"}</span><span>🟡 {counts.low} {isNe ? "कम" : "Low"}</span><span>⚪ {counts.needs_review} {isNe ? "जाँच" : "Review"}</span></section>}{data.reportSummary && <article className="result-card"><h2>{isNe ? "रिपोर्टको सरल सारांश" : "Analysis Summary"}</h2><p>{isNe ? "यस रिपोर्टका मुख्य नतिजा तल देखाइएको छ। कुनै नतिजा उच्च वा कम भएमा डाक्टरलाई देखाएर बुझ्नुहोस्।" : data.reportSummary}</p></article>}{hasResults ? <section className="result-list">{data.results.map((result) => <ResultCard key={`${result.testName}-${result.value}`} result={result} isNe={isNe}/>)}</section> : <section className="empty-state"><AlertCircle size={38}/><h2>{isNe ? "नतिजा पढ्न सकिएन" : "No Results Found"}</h2><p>{isNe ? "कृपया स्पष्ट तस्वीर पठाउनुहोस्।" : "Please upload a clearer image."}</p></section>}<section className="safety-box"><CircleAlert size={22}/><div><h2>{isNe ? "महत्त्वपूर्ण स्वास्थ्य सूचना" : "Important Medical Disclaimer"}</h2><p>{isNe ? "यो जानकारी बुझ्न सजिलो बनाउन मात्र हो। यसले रोगको निदान गर्दैन। स्वास्थ्यसम्बन्धी चिन्तामा योग्य स्वास्थ्यकर्मीसँग सल्लाह लिनुहोस्।" : "ReportScan provides educational information only. Always consult a qualified healthcare provider."}</p></div></section><div className="button-row"><Link href="/scan" className="primary-action"><CheckCircle2 size={18}/>{isNe ? "अर्को रिपोर्ट स्क्यान गर्नुहोस्" : "Scan Another Report"}</Link></div></div>;
 }
+function countResults(results) { return { high: results.filter((r) => r.status === "high").length, normal: results.filter((r) => r.status === "normal").length, low: results.filter((r) => r.status === "low").length, needs_review: results.filter((r) => r.status === "needs_review" || r.status === "unknown").length }; }
