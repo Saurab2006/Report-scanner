@@ -158,7 +158,7 @@ export default function LoginPage() {
               <input
                 id="login-email"
                 type="email"
-                placeholder={isNe ? "आफ्नो इमेल प्रविष्ट गर्नुहोस्" : "Enter your email"}
+                placeholder={isNe ? "आफ्नो इमेल ठेगाना प्रविष्ट गर्नुहोस्" : "Enter your email address"}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 autoComplete="email"
@@ -233,9 +233,7 @@ export default function LoginPage() {
               </span>
             ) : (
               <span className="btn-label-content">
-                <LogIn size={20} />
-                <span>{isNe ? "लगइन गर्नुहोस्" : "Login"}</span>
-                <ArrowRight size={18} className="btn-arrow-icon" />
+                <span>{isNe ? "लगइन गर्नुहोस् →" : "Login →"}</span>
               </span>
             )}
           </button>

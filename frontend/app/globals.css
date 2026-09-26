@@ -697,10 +697,10 @@ textarea:focus {
   display: flex;
   align-items: stretch;
   justify-content: center;
-  padding: clamp(16px, 2.5vw, 32px) clamp(14px, 3vw, 32px);
-  background: radial-gradient(circle at 10% 20%, rgba(209, 250, 229, 0.45) 0%, transparent 50%),
-              radial-gradient(circle at 90% 80%, rgba(167, 243, 208, 0.35) 0%, transparent 45%),
-              linear-gradient(180deg, #f7faf8 0%, #edf7f2 100%);
+  padding: 0 clamp(16px, 3vw, 40px);
+  background: radial-gradient(circle at 10% 20%, rgba(209, 250, 229, 0.6) 0%, transparent 60%),
+              radial-gradient(circle at 85% 85%, rgba(167, 243, 208, 0.45) 0%, transparent 50%),
+              linear-gradient(180deg, #f2faf6 0%, #e8f7f0 100%);
   overflow-x: clip;
 }
 
@@ -711,28 +711,28 @@ textarea:focus {
   filter: blur(80px);
   pointer-events: none;
   z-index: 0;
-  opacity: 0.55;
+  opacity: 0.45;
 }
 
 .blob-1 {
-  width: 420px;
-  height: 420px;
+  width: 440px;
+  height: 440px;
   top: -80px;
   left: -80px;
   background: #a7f3d0;
 }
 
 .blob-2 {
-  width: 480px;
-  height: 480px;
+  width: 500px;
+  height: 500px;
   bottom: -100px;
   right: -80px;
   background: #6ee7b7;
 }
 
 .blob-3 {
-  width: 300px;
-  height: 300px;
+  width: 320px;
+  height: 320px;
   top: 40%;
   left: 45%;
   background: #d1fae5;
@@ -744,7 +744,7 @@ textarea:focus {
   height: 140px;
   background-image: radial-gradient(#10b981 1.5px, transparent 1.5px);
   background-size: 14px 14px;
-  opacity: 0.25;
+  opacity: 0.22;
   pointer-events: none;
   z-index: 0;
 }
@@ -764,7 +764,7 @@ textarea:focus {
   font-size: 38px;
   font-weight: 300;
   color: #10b981;
-  opacity: 0.2;
+  opacity: 0.18;
   pointer-events: none;
   z-index: 0;
   user-select: none;
@@ -788,15 +788,15 @@ textarea:focus {
   display: grid;
   grid-template-columns: 1fr;
   gap: 24px;
-  width: min(100%, 1240px);
+  width: min(100%, 1280px);
   margin: 0 auto;
   align-items: start;
 }
 
 @media (min-width: 960px) {
   .auth-container {
-    grid-template-columns: 46% 54%;
-    gap: clamp(24px, 3.5vw, 48px);
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: clamp(24px, 4vw, 56px);
     align-items: start;
   }
 }
@@ -813,9 +813,9 @@ textarea:focus {
 @media (min-width: 960px) {
   .auth-showcase-panel {
     position: sticky;
-    top: 80px;
-    height: calc(100vh - 100px);
-    max-height: 720px;
+    top: 64px;
+    height: calc(100vh - 64px);
+    padding: 20px 0;
   }
 }
 
@@ -823,28 +823,23 @@ textarea:focus {
   position: relative;
   width: 100%;
   height: 100%;
-  border-radius: 28px;
-  overflow: hidden;
-  background: #ffffff;
-  border: 1px solid rgba(167, 243, 208, 0.85);
-  box-shadow: 0 20px 50px rgba(6, 78, 59, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04);
+  max-height: 85vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.auth-hero-banner-frame:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 26px 60px rgba(6, 78, 59, 0.16);
+  background: transparent;
+  border: none;
+  box-shadow: none;
 }
 
 .auth-hero-banner-image {
   width: 100%;
-  height: 100%;
+  height: auto;
+  max-height: 85vh;
   object-fit: contain;
   object-position: center;
   display: block;
+  filter: drop-shadow(0 14px 30px rgba(6, 78, 59, 0.07));
 }
 
 /* =========================================================
@@ -856,18 +851,17 @@ textarea:focus {
   justify-content: center;
   align-items: flex-start;
   width: 100%;
-  padding-bottom: clamp(40px, 6vw, 80px);
+  padding: clamp(24px, 3.5vw, 44px) 0 clamp(40px, 6vw, 80px);
 }
 
 .auth-card-box {
   width: 100%;
   max-width: 480px;
-  background: rgba(255, 255, 255, 0.96);
-  backdrop-filter: blur(20px);
-  border: 1px solid #d1fae5;
-  border-radius: 28px;
-  padding: clamp(24px, 4vw, 36px);
-  box-shadow: 0 20px 50px rgba(6, 78, 59, 0.12), 0 1px 3px rgba(0, 0, 0, 0.05);
+  background: #ffffff;
+  border: 1px solid rgba(226, 242, 234, 0.9);
+  border-radius: 32px;
+  padding: clamp(24px, 4vw, 38px);
+  box-shadow: 0 16px 48px rgba(6, 78, 59, 0.08), 0 2px 10px rgba(0, 0, 0, 0.03);
 }
 
 /* Header inside Card */
@@ -885,33 +879,33 @@ textarea:focus {
   justify-content: center;
   width: 58px;
   height: 58px;
-  border-radius: 20px;
-  background: #022c22;
-  box-shadow: 0 8px 24px rgba(5, 150, 105, 0.28);
+  border-radius: 18px;
+  background: #012a1c;
+  box-shadow: 0 6px 18px rgba(0, 168, 107, 0.25);
   margin-bottom: 12px;
 }
 
 .auth-card-title {
-  font-size: 1.45rem;
-  font-weight: 900;
+  font-size: 1.55rem;
+  font-weight: 850;
   color: #064e3b;
   margin: 0;
   letter-spacing: -0.01em;
 }
 
 .auth-card-tagline {
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   font-weight: 700;
-  color: #059669;
-  margin: 2px 0 16px;
+  color: #00a86b;
+  margin: 4px 0 18px;
 }
 
 /* Tab Switcher */
 .auth-nav-tabs {
   display: flex;
   width: 100%;
-  background: #f0fdf4;
-  border: 1px solid #d1fae5;
+  background: #f1f8f4;
+  border: 1px solid #d8ede2;
   border-radius: 14px;
   padding: 4px;
   gap: 4px;
@@ -920,18 +914,18 @@ textarea:focus {
 .auth-tab-btn {
   flex: 1;
   text-align: center;
-  padding: 8px 14px;
-  font-size: 0.9rem;
-  font-weight: 800;
+  padding: 10px 16px;
+  font-size: 0.92rem;
+  font-weight: 750;
   border-radius: 10px;
-  color: #4b6357;
+  color: #475569;
   transition: all 0.2s ease;
 }
 
 .auth-tab-btn.active {
-  background: #ffffff;
-  color: #047857;
-  box-shadow: 0 2px 8px rgba(6, 78, 59, 0.1);
+  background: #00a86b;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 168, 107, 0.28);
 }
 
 /* Heading inside form */
@@ -941,15 +935,15 @@ textarea:focus {
 }
 
 .auth-title {
-  font-size: 1.4rem;
-  font-weight: 900;
+  font-size: 1.35rem;
+  font-weight: 800;
   color: #064e3b;
   margin: 0;
   line-height: 1.2;
 }
 
 .auth-subtitle {
-  font-size: 0.88rem;
+  font-size: 0.86rem;
   color: #64748b;
   margin: 4px 0 0;
 }
@@ -1001,19 +995,19 @@ textarea:focus {
   padding: 10px 16px;
   background: #ffffff;
   border: 1.5px solid #e2e8f0;
-  border-radius: 14px;
+  border-radius: 12px;
   color: #1e293b;
   font-size: 0.94rem;
-  font-weight: 750;
+  font-weight: 650;
   cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
   transition: all 0.2s ease;
 }
 
 .google-auth-button:hover {
   background: #f8fafc;
   border-color: #cbd5e1;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
   transform: translateY(-1px);
 }
 
@@ -1027,12 +1021,12 @@ textarea:focus {
   display: flex;
   align-items: center;
   text-align: center;
-  margin: 18px 0;
+  margin: 20px 0;
   color: #94a3b8;
-  font-size: 0.8rem;
-  font-weight: 700;
+  font-size: 0.74rem;
+  font-weight: 750;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
 }
 
 .auth-divider::before,
@@ -1064,7 +1058,7 @@ textarea:focus {
   align-items: center;
   gap: 6px;
   font-size: 0.84rem;
-  font-weight: 800;
+  font-weight: 750;
   color: #1e293b;
 }
 
@@ -1076,10 +1070,10 @@ textarea:focus {
 
 .form-input {
   width: 100%;
-  min-height: 46px;
+  min-height: 48px;
   padding: 10px 14px;
   background: #ffffff;
-  border: 1.5px solid #d1fae5;
+  border: 1.5px solid #e2e8f0;
   border-radius: 12px;
   color: #0f172a;
   font-size: 0.94rem;
@@ -1092,8 +1086,8 @@ textarea:focus {
 }
 
 .form-input:focus {
-  border-color: #10b981;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.18);
+  border-color: #00a86b;
+  box-shadow: 0 0 0 3px rgba(0, 168, 107, 0.16);
 }
 
 .form-input::placeholder {
@@ -1117,7 +1111,7 @@ textarea:focus {
 }
 
 .password-toggle-btn:hover {
-  color: #059669;
+  color: #00a86b;
 }
 
 /* Password Strength */
@@ -1152,7 +1146,7 @@ textarea:focus {
 }
 
 .strength-progress.strong {
-  background: #10b981;
+  background: #00a86b;
 }
 
 .strength-text {
@@ -1182,7 +1176,7 @@ textarea:focus {
 }
 
 .checkbox-container input[type="checkbox"] {
-  accent-color: #059669;
+  accent-color: #00a86b;
   width: 16px;
   height: 16px;
   cursor: pointer;
@@ -1197,7 +1191,7 @@ textarea:focus {
 .forgot-link-btn {
   background: transparent;
   border: 0;
-  color: #059669;
+  color: #00a86b;
   font-size: 0.82rem;
   font-weight: 800;
   cursor: pointer;
@@ -1207,7 +1201,7 @@ textarea:focus {
 }
 
 .forgot-link-btn:hover {
-  color: #047857;
+  color: #00875a;
 }
 
 /* Primary Auth Submit Button */
@@ -1216,24 +1210,24 @@ textarea:focus {
   align-items: center;
   justify-content: center;
   width: 100%;
-  min-height: 50px;
+  min-height: 48px;
   margin-top: 6px;
   padding: 12px 20px;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: #00a86b;
   color: #ffffff;
   border: 0;
-  border-radius: 14px;
-  font-size: 0.98rem;
-  font-weight: 900;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 750;
   cursor: pointer;
-  box-shadow: 0 10px 24px rgba(5, 150, 105, 0.32);
+  box-shadow: 0 6px 18px rgba(0, 168, 107, 0.26);
   transition: all 0.2s ease;
 }
 
 .auth-submit-btn:hover {
-  background: linear-gradient(135deg, #059669 0%, #047857 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 14px 28px rgba(5, 150, 105, 0.4);
+  background: #00915c;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 22px rgba(0, 168, 107, 0.32);
 }
 
 .auth-submit-btn:active {

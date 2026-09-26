@@ -329,9 +329,7 @@ export default function SignupPage() {
               </span>
             ) : (
               <span className="btn-label-content">
-                <UserPlus size={20} />
-                <span>{isNe ? "खाता सिर्जना गर्नुहोस्" : "Create Account"}</span>
-                <ArrowRight size={18} className="btn-arrow-icon" />
+                <span>{isNe ? "खाता सिर्जना गर्नुहोस् →" : "Create Account →"}</span>
               </span>
             )}
           </button>
