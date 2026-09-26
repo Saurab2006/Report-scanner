@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { FileText, BarChart3, Heart, CheckCircle2, Sparkles, ShieldCheck } from "lucide-react";
 import { useLang } from "./LanguageContext";
 
 export function AuthLayout({ children, activeTab = "login" }) {
@@ -21,110 +20,17 @@ export function AuthLayout({ children, activeTab = "login" }) {
       <div className="floating-plus plus-2" aria-hidden="true">+</div>
 
       <div className="auth-container">
-        {/* LEFT COLUMN: HERO SHOWCASE */}
-        <section className="auth-showcase-panel">
-          {/* Header Brand */}
-          <div className="showcase-brand">
-            <div className="brand-logo-glow">
-              <Image
-                src="/swastha-logo.jpg"
-                alt="SwasthaScan Logo"
-                width={56}
-                height={56}
-                priority
-                className="rounded-2xl object-cover shadow-md"
-              />
-            </div>
-            <div>
-              <h2 className="showcase-brand-title">
-                Swastha<span>Scan</span>
-              </h2>
-              <p className="showcase-brand-tagline">
-                {isNe ? "स्क्यान • बुझ्नुहोस् • स्वस्थ रहनुहोस्" : "Scan • Understand • Stay Healthy"}
-              </p>
-            </div>
-          </div>
-
-          {/* Hero Feature Pill */}
-          <div className="showcase-pill">
-            <CheckCircle2 size={16} className="text-emerald-600" />
-            <span>{isNe ? "तपाईंको स्वास्थ्य रिपोर्ट, अब सरल र स्पष्ट" : "Your Health Reports, Made Simple"}</span>
-          </div>
-
-          {/* Main Title & Description */}
-          <div className="showcase-copy">
-            <h1>
-              {activeTab === "signup"
-                ? isNe
-                  ? "SwasthaScan मा सामेल हुनुहोस्"
-                  : "Join SwasthaScan Today"
-                : isNe
-                ? "SwasthaScan मा स्वागत छ"
-                : "Welcome to SwasthaScan"}
-            </h1>
-            <p>
-              {isNe
-                ? "आफ्नो मेडिकल रिपोर्टहरू सजिलै अपलोड र स्क्यान गर्नुहोस्। तत्काल जानकारी प्राप्त गर्नुहोस्, आफ्नो स्वास्थ्यलाई राम्ररी बुझ्नुहोस् र आफ्नो स्वास्थ्यको ख्याल राख्नुहोस्।"
-                : "Upload and scan your medical reports with ease. Get instant insights, understand your health better, and take control of your well-being."}
-            </p>
-          </div>
-
-          {/* Three Feature Highlight Badges */}
-          <div className="showcase-features-grid">
-            <div className="feature-badge-card">
-              <div className="feature-badge-icon">
-                <FileText size={20} />
-              </div>
-              <div>
-                <strong>{isNe ? "रिपोर्ट स्क्यान" : "Scan Reports"}</strong>
-                <small>{isNe ? "फोटो वा PDF" : "JPG, PNG & PDF"}</small>
-              </div>
-            </div>
-
-            <div className="feature-badge-card">
-              <div className="feature-badge-icon">
-                <BarChart3 size={20} />
-              </div>
-              <div>
-                <strong>{isNe ? "स्पष्ट विवरण" : "Get Insights"}</strong>
-                <small>{isNe ? "HIGH, NORMAL, LOW" : "Instant Indicators"}</small>
-              </div>
-            </div>
-
-            <div className="feature-badge-card">
-              <div className="feature-badge-icon">
-                <Heart size={20} />
-              </div>
-              <div>
-                <strong>{isNe ? "राम्रो निर्णय" : "Better Decisions"}</strong>
-                <small>{isNe ? "सजिलो र सुरक्षित" : "Healthier Life"}</small>
-              </div>
-            </div>
-          </div>
-
-          {/* Aesthetic Doctor Illustration / Graphic Frame */}
-          <div className="showcase-visual-wrapper">
-            <div className="health-matters-tag">
-              <Sparkles size={16} />
-              <span>{isNe ? "तपाईंको स्वास्थ्य महत्त्वपूर्ण छ" : "Your Health Matters"}</span>
-            </div>
-
-            <div className="doctor-visual-card">
-              <div className="doctor-art-container">
-                <Image
-                  src="/auth-hero-illustration.png"
-                  alt="Doctor Illustration"
-                  width={460}
-                  height={380}
-                  className="doctor-illustration-img"
-                  priority
-                />
-              </div>
-              <div className="doctor-card-subtext">
-                <ShieldCheck size={16} />
-                <span>{isNe ? "१००% सुरक्षित र गोप्य रिपोर्ट विश्लेषण" : "100% Secure & Confidential Report Analysis"}</span>
-              </div>
-            </div>
+        {/* LEFT COLUMN: HERO GRAPHIC SHOWCASE */}
+        <section className="auth-showcase-panel" aria-label="SwasthaScan Overview">
+          <div className="auth-hero-banner-frame">
+            <Image
+              src="/auth-left-banner.png"
+              alt="SwasthaScan - Scan, Understand, Stay Healthy. Upload and scan your medical reports with ease."
+              width={820}
+              height={560}
+              priority
+              className="auth-hero-banner-image"
+            />
           </div>
         </section>
 

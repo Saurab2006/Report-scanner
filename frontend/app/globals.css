@@ -787,213 +787,49 @@ textarea:focus {
   z-index: 1;
   display: grid;
   grid-template-columns: 1fr;
-  gap: 32px;
-  width: min(100%, 1160px);
+  gap: 28px;
+  width: min(100%, 1200px);
   margin: 0 auto;
   align-items: center;
 }
 
 @media (min-width: 960px) {
   .auth-container {
-    grid-template-columns: 1.15fr 1fr;
-    gap: 48px;
+    grid-template-columns: 1.25fr 1fr;
+    gap: 40px;
   }
 }
 
-/* Showcase Hero Panel (Left) */
+/* Showcase Hero Banner Panel (Left) */
 .auth-showcase-panel {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  padding: 10px 0;
-}
-
-.showcase-brand {
-  display: flex;
+  justify-content: center;
   align-items: center;
-  gap: 14px;
+  width: 100%;
 }
 
-.brand-logo-glow {
+.auth-hero-banner-frame {
   position: relative;
+  width: 100%;
+  border-radius: 28px;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid rgba(167, 243, 208, 0.85);
+  box-shadow: 0 20px 50px rgba(6, 78, 59, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.brand-logo-glow::after {
-  content: "";
-  position: absolute;
-  inset: -3px;
-  background: linear-gradient(135deg, #10b981, #059669);
-  border-radius: 18px;
-  z-index: -1;
-  opacity: 0.4;
-  filter: blur(6px);
-}
-
-.showcase-brand-title {
-  font-size: 1.8rem;
-  font-weight: 900;
-  letter-spacing: -0.02em;
-  color: #064e3b;
-  margin: 0;
-  line-height: 1.1;
-}
-
-.showcase-brand-title span {
-  color: #059669;
-}
-
-.showcase-brand-tagline {
-  font-size: 0.86rem;
-  color: #047857;
-  font-weight: 700;
-  margin: 3px 0 0;
-  letter-spacing: 0.02em;
-}
-
-.showcase-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  width: fit-content;
-  padding: 6px 14px;
-  border-radius: 999px;
-  background: rgba(16, 185, 129, 0.12);
-  border: 1px solid rgba(16, 185, 129, 0.28);
-  color: #065f46;
-  font-size: 0.84rem;
-  font-weight: 800;
-}
-
-.showcase-copy h1 {
-  font-size: clamp(2rem, 3.8vw, 3.1rem);
-  font-weight: 950;
-  color: #064e3b;
-  line-height: 1.12;
-  margin: 0;
-  letter-spacing: -0.02em;
-}
-
-.showcase-copy p {
-  margin: 12px 0 0;
-  color: #4b6357;
-  font-size: clamp(0.96rem, 1.2vw, 1.08rem);
-  line-height: 1.6;
-  max-width: 540px;
-}
-
-/* Feature Badges Cards Grid */
-.showcase-features-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 12px;
-  margin-top: 6px;
-}
-
-.feature-badge-card {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 14px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(167, 243, 208, 0.7);
-  box-shadow: 0 4px 16px rgba(6, 78, 59, 0.04);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.feature-badge-card:hover {
+.auth-hero-banner-frame:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(6, 78, 59, 0.08);
+  box-shadow: 0 26px 60px rgba(6, 78, 59, 0.16);
 }
 
-.feature-badge-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: #ecfdf5;
-  color: #059669;
-  flex-shrink: 0;
-}
-
-.feature-badge-card strong {
-  display: block;
-  font-size: 0.86rem;
-  color: #064e3b;
-  line-height: 1.2;
-}
-
-.feature-badge-card small {
-  display: block;
-  font-size: 0.74rem;
-  color: #047857;
-  font-weight: 600;
-  margin-top: 2px;
-}
-
-/* Doctor Visual Showcase */
-.showcase-visual-wrapper {
-  position: relative;
-  margin-top: 10px;
-}
-
-.health-matters-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  position: absolute;
-  top: 14px;
-  left: 14px;
-  z-index: 2;
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: #047857;
-  color: #ffffff;
-  font-size: 0.82rem;
-  font-weight: 800;
-  box-shadow: 0 4px 12px rgba(4, 120, 87, 0.3);
-}
-
-.doctor-visual-card {
-  position: relative;
-  border-radius: 24px;
-  overflow: hidden;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(236, 253, 245, 0.7) 100%);
-  border: 1px solid rgba(167, 243, 208, 0.8);
-  box-shadow: 0 16px 40px rgba(6, 78, 59, 0.08);
-}
-
-.doctor-art-container {
+.auth-hero-banner-image {
   width: 100%;
-  max-height: 240px;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #e6f7ef;
-}
-
-.doctor-illustration-img {
-  width: 100%;
-  height: 100%;
-  max-height: 240px;
+  height: auto;
+  display: block;
   object-fit: cover;
-  object-position: 25% 40%;
-}
-
-.doctor-card-subtext {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: #065f46;
-  background: rgba(255, 255, 255, 0.95);
-  border-top: 1px solid rgba(167, 243, 208, 0.6);
 }
 
 /* =========================================================
