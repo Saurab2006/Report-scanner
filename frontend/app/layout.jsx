@@ -2,6 +2,7 @@ import "./globals.css";
 import { LangProvider } from "@/components/LanguageContext";
 import { AuthProvider } from "@/components/AuthContext";
 import { Navigation } from "@/components/Navigation";
+import { AppFooter } from "@/components/AppFooter";
 
 export const metadata = {
   title: "SwasthaScan | Medical Report Scanner & Insights",
@@ -16,10 +17,7 @@ export default function RootLayout({ children }) {
           <LangProvider>
             <Navigation />
             <main>{children}</main>
-            <footer className="app-footer">
-              <strong>SwasthaScan</strong>
-              <span>Educational support only. Consult a qualified healthcare professional.</span>
-            </footer>
+            <AppFooter />
           </LangProvider>
         </AuthProvider>
       </body>

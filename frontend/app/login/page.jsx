@@ -62,7 +62,7 @@ export default function LoginPage() {
         isNe ? "लगइन सफल भयो! रिडिरेक्ट गर्दै..." : "Login successful! Redirecting..."
       );
       setTimeout(() => {
-        router.push("/scan");
+        router.push("/dashboard");
       }, 700);
     } catch (err) {
       setErrorMessage(
@@ -84,7 +84,7 @@ export default function LoginPage() {
         isNe ? "गुगल लगइन सफल भयो! रिडिरेक्ट गर्दै..." : "Google sign-in successful! Redirecting..."
       );
       setTimeout(() => {
-        router.push("/scan");
+        router.push("/dashboard");
       }, 700);
     } catch (err) {
       setErrorMessage(

@@ -103,7 +103,7 @@ export default function SignupPage() {
           : "Account created successfully! Redirecting..."
       );
       setTimeout(() => {
-        router.push("/scan");
+        router.push("/dashboard");
       }, 700);
     } catch (err) {
       setErrorMessage(
@@ -127,7 +127,7 @@ export default function SignupPage() {
           : "Google sign-up successful! Redirecting..."
       );
       setTimeout(() => {
-        router.push("/scan");
+        router.push("/dashboard");
       }, 700);
     } catch (err) {
       setErrorMessage(

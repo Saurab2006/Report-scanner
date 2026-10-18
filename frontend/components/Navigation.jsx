@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ScanLine, LogIn, UserPlus, LogOut, User } from "lucide-react";
+import { ScanLine, LogIn, UserPlus, LogOut, LayoutDashboard, History } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useLang } from "./LanguageContext";
 import { useAuth } from "./AuthContext";
 
@@ -10,6 +11,8 @@ export function Navigation() {
   const { lang, setLang } = useLang();
   const { user, isAuthenticated, logout } = useAuth();
   const isNe = lang === "ne";
+  const router = useRouter();
+  const handleLogout = () => { logout(); router.push("/login"); };
 
   return (
     <header className="app-header">
@@ -30,27 +33,17 @@ export function Navigation() {
       </Link>
 
       <nav className="header-actions" aria-label="Main navigation">
-        <Link href="/scan" className="scan-link">
-          <ScanLine size={16} />
-          {isNe ? "स्क्यान" : "Scan"}
-        </Link>
-
         {isAuthenticated ? (
           <div className="user-profile-menu">
+            <Link href="/dashboard" className="nav-item"><LayoutDashboard size={16}/><span>{isNe ? "ड्यासबोर्ड" : "Dashboard"}</span></Link>
+            <Link href="/report/analysis" className="nav-item nav-history"><History size={16}/><span>{isNe ? "इतिहास" : "History"}</span></Link>
+            <Link href="/scan" className="scan-link"><ScanLine size={16}/>{isNe ? "स्क्यान" : "Scan"}</Link>
             <div className="user-avatar-pill" title={user?.email}>
-              {user?.avatar ? (
-                <img
-                  src={user.avatar}
-                  alt={user.name || "User"}
-                  className="user-avatar-img"
-                />
-              ) : (
-                <User size={16} />
-              )}
+              <span className="user-initials" aria-hidden="true">{(user?.name || "U").trim().charAt(0).toUpperCase()}</span>
               <span className="user-name-label">{user?.name || "User"}</span>
             </div>
             <button
-              onClick={logout}
+              onClick={handleLogout}
               className="logout-btn"
               title={isNe ? "लगआउट गर्नुहोस्" : "Log Out"}
             >

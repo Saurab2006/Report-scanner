@@ -1,10 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useLang } from "./LanguageContext";
+import { FileSearch, ChartNoAxesCombined, HeartPulse, Stethoscope, Lightbulb } from "lucide-react";
 
-export function AuthLayout({ children, activeTab = "login" }) {
+export function AuthLayout({ children }) {
   const { lang } = useLang();
   const isNe = lang === "ne";
 
@@ -21,7 +21,7 @@ export function AuthLayout({ children, activeTab = "login" }) {
 
       <div className="auth-container">
         {/* LEFT COLUMN: HERO GRAPHIC SHOWCASE */}
-        <section className="auth-showcase-panel" aria-label="SwasthaScan Overview">
+        <section className="auth-showcase-panel" aria-label={isNe ? "स्वास्थ्य रिपोर्ट जानकारी" : "SwasthaScan overview"}>
           <div className="auth-hero-banner-frame">
             <Image
               src="/auth-left-banner.png"
@@ -31,6 +31,18 @@ export function AuthLayout({ children, activeTab = "login" }) {
               priority
               className="auth-hero-banner-image"
             />
+          </div>
+          <div className="auth-feature-band">
+            <div className="auth-feature-heading">
+              <span className="auth-feature-mark"><HeartPulse size={18}/></span>
+              <div><strong>{isNe ? "तपाईंको रिपोर्टबाट स्पष्ट जानकारी" : "Clear insights from your reports"}</strong><span>{isNe ? "सुरक्षित रूपमा बुझ्नुहोस् र अर्को कदम तय गर्नुहोस्" : "Understand results and plan your next steps"}</span></div>
+            </div>
+            <div className="auth-feature-grid">
+              <div><FileSearch size={18}/><span>{isNe ? "असामान्य नतिजा" : "Flag results"}</span></div>
+              <div><Lightbulb size={18}/><span>{isNe ? "सरल व्याख्या" : "Plain explanations"}</span></div>
+              <div><ChartNoAxesCombined size={18}/><span>{isNe ? "स्वास्थ्य प्रवृत्ति" : "Track trends"}</span></div>
+              <div><Stethoscope size={18}/><span>{isNe ? "चिकित्सकसँग छलफल" : "Talk to a doctor"}</span></div>
+            </div>
           </div>
         </section>
 
@@ -55,21 +67,6 @@ export function AuthLayout({ children, activeTab = "login" }) {
                 {isNe ? "स्क्यान • बुझ्नुहोस् • स्वस्थ रहनुहोस्" : "Scan • Understand • Stay Healthy"}
               </p>
 
-              {/* Navigation Switch Tabs */}
-              <div className="auth-nav-tabs" role="tablist">
-                <Link
-                  href="/login"
-                  className={`auth-tab-btn ${activeTab === "login" ? "active" : ""}`}
-                >
-                  {isNe ? "लगइन" : "Login"}
-                </Link>
-                <Link
-                  href="/signup"
-                  className={`auth-tab-btn ${activeTab === "signup" ? "active" : ""}`}
-                >
-                  {isNe ? "साइन अप" : "Sign Up"}
-                </Link>
-              </div>
             </div>
 
             {/* Dynamic Form Content */}
